@@ -1,0 +1,26 @@
+# udev rules for tr4mpass
+# Place this file at /etc/udev/rules.d/51-apple-usb.rules on Linux hosts
+# Grants non-root access to Apple USB devices so tools using libusb (DFU) can open them.
+# Vendor: Apple, Inc. (0x05ac)
+# Common DFU / recovery product IDs are included where known; the generic
+# vendor rule is present to cover other devices.
+
+# Generic Apple vendor rule (matches all Apple devices)
+SUBSYSTEM=="usb", ATTR{idVendor}=="05ac", MODE="0666", GROUP="plugdev", TAG+="uaccess"
+
+# Common DFU / recovery product IDs (examples) - keep these for specificity
+# DFU mode (many devices): idProduct==0x1227
+SUBSYSTEM=="usb", ATTR{idVendor}=="05ac", ATTR{idProduct}=="1227", MODE="0666", GROUP="plugdev", TAG+="uaccess"
+# Recovery / iBoot (example id used by some devices): 0x1281
+SUBSYSTEM=="usb", ATTR{idVendor}=="05ac", ATTR{idProduct}=="1281", MODE="0666", GROUP="plugdev", TAG+="uaccess"
+
+# Notes:
+# - After installing this file to /etc/udev/rules.d/ run:
+#     sudo udevadm control --reload
+#     sudo udevadm trigger
+# - You may need to unplug/replug the device. On some systems a user logout/login
+#   is required for group membership changes (plugdev) to take effect.
+# - If your distro uses a different group for granting access (e.g. "usb" or
+#   "dialout"), change GROUP accordingly.
+# - If you prefer to be more restrictive, remove the generic vendor rule and
+#   only keep the specific ATTR{idProduct} entries for the device(s) you test.
